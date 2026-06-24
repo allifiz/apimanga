@@ -1,0 +1,32 @@
+{
+  "name": "apimanga",
+  "version": "1.0.0",
+  "description": "Lightweight proxy-cache API for manga endpoints on a small Azure VPS.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:restart": "pm2 restart apimanga",
+    "pm2:logs": "pm2 logs apimanga"
+  },
+  "keywords": [
+    "manga",
+    "fastify",
+    "sqlite",
+    "proxy-cache"
+  ],
+  "author": "allifiz",
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "@fastify/rate-limit": "^10.2.2",
+    "better-sqlite3": "^11.8.1",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
