@@ -6,17 +6,9 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
-    "pm2:start": "pm2 start ecosystem.config.cjs",
-    "pm2:restart": "pm2 restart apimanga",
-    "pm2:logs": "pm2 logs apimanga"
+    "dev": "node --watch src/server.js"
   },
-  "keywords": [
-    "manga",
-    "fastify",
-    "sqlite",
-    "proxy-cache"
-  ],
+  "keywords": ["manga", "fastify", "sqlite", "cache"],
   "author": "allifiz",
   "license": "MIT",
   "dependencies": {
@@ -26,7 +18,5 @@
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1"
   },
-  "engines": {
-    "node": ">=20"
-  }
+  "engines": { "node": ">=20" }
 }
