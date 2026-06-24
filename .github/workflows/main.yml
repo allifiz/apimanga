@@ -27,11 +27,23 @@ jobs:
             echo "Install production dependencies..."
             npm install --omit=dev
 
-            echo "Restart PM2 app..."
-            pm2 restart apimanga || pm2 start src/server.js --name apimanga --max-memory-restart 350M
+                       echo "Restart PM2 app..."
+            pm2 restart apimanga --update-env || pm2 start src/server.js --name apimanga --max-memory-restart 350M
 
             echo "Save PM2 process list..."
             pm2 save
 
             echo "Health check..."
-            curl -f http://127.0.0.1:4000/health
+            for i in {1..10}; do
+              if curl -f http://127.0.0.1:4000/health; then
+                echo "Health check passed"
+                exit 0
+              fi
+
+              echo "Waiting for app to be ready... attempt $i"
+              sleep 2
+            done
+
+            echo "Health check failed"
+            pm2 logs apimanga --lines 50 --nostream
+            exit 1
