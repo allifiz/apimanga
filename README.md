@@ -1,6 +1,6 @@
 <div align="center">
 
-#  apimanga
+# apimanga
 
 ### Lightweight Manga API Proxy-Cache for Small VPS Environments
 
@@ -13,44 +13,36 @@
 </p>
 
 <p>
-  <b>Fastify API layer that caches manga responses, reduces repeated upstream calls, and keeps a manga reader frontend stable on a tiny VPS.</b>
+  <b>Fastify API layer that caches manga responses, reduces repeated upstream calls, and keeps a manga reader frontend stable on a small VPS.</b>
 </p>
 
 <p>
-  <a href="#-features">Features</a>
+  <a href="#overview">Overview</a>
   ·
-  <a href="#-architecture">Architecture</a>
+  <a href="#features">Features</a>
   ·
-  <a href="#-endpoints">Endpoints</a>
+  <a href="#architecture">Architecture</a>
   ·
-  <a href="#-deployment">Deployment</a>
+  <a href="#endpoints">Endpoints</a>
   ·
-  <a href="#-roadmap">Roadmap</a>
+  <a href="#deployment">Deployment</a>
+  ·
+  <a href="#roadmap">Roadmap</a>
 </p>
 
 </div>
 
 ---
 
-##  Overview
+## Overview
 
 **apimanga** is a lightweight proxy-cache API for manga reader applications.
 
-It sits between your frontend and an upstream manga API, then handles caching, request throttling, timeout control, and stale fallback from a small backend service.
+It sits between a frontend app and an upstream manga API, then handles caching, request throttling, timeout control, and stale fallback from a small backend service.
 
-Instead of letting the frontend call the upstream API directly, this service gives you a more stable backend layer:
+Instead of letting the frontend call the upstream API directly, this service provides a more stable backend layer that is easier to monitor, tune, and deploy.
 
-```txt
-Frontend App
-   ↓
-apimanga API
-   ↓
-SQLite Cache
-   ↓
-Upstream Manga API
-```
-
-Built for a small Azure VPS setup:
+Built for a small VPS setup:
 
 ```txt
 1 vCPU · 2GB RAM · Node.js · PM2 · Nginx · SQLite
@@ -58,13 +50,13 @@ Built for a small Azure VPS setup:
 
 ---
 
-##  Features
+## Features
 
 <table>
 <tr>
 <td width="50%">
 
-###  Proxy API
+### Proxy API
 
 * Latest comics
 * Popular comics
@@ -78,21 +70,21 @@ Built for a small Azure VPS setup:
 </td>
 <td width="50%">
 
-### Smart Cache
+### Cache Layer
 
 * SQLite response cache
 * Per-endpoint TTL
-* Cache hit/miss headers
+* Cache hit and miss headers
 * Stale cache fallback
 * Cache stats endpoint
-* Lightweight storage
+* Lightweight local storage
 
 </td>
 </tr>
 <tr>
 <td width="50%">
 
-###  Protection Layer
+### Protection Layer
 
 * Public rate limit
 * Upstream request throttle
@@ -103,13 +95,13 @@ Built for a small Azure VPS setup:
 </td>
 <td width="50%">
 
-###  VPS Ready
+### VPS Ready
 
 * Node.js 20+
 * PM2 compatible
 * Nginx reverse proxy
 * Low memory usage
-* Simple `.env` configuration
+* Simple environment configuration
 
 </td>
 </tr>
@@ -117,42 +109,47 @@ Built for a small Azure VPS setup:
 
 ---
 
-##  Architecture
+## Architecture
 
-```txt
-┌─────────────────────────────┐
-│      Manga Frontend App     │
-│   Vercel / Static Frontend  │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│      Nginx Reverse Proxy    │
-│       Public API Layer      │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│        Fastify Server       │
-│  Routes · Rate Limit · TTL  │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│        SQLite Cache         │
-│   HIT · MISS · STALE DATA   │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│      Upstream Manga API     │
-│      External Data Source   │
-└─────────────────────────────┘
+```mermaid
+flowchart TD
+    FE[Frontend App]
+    NG[Nginx Reverse Proxy]
+    API[Fastify API Server]
+    CACHE[(SQLite Cache)]
+    UPSTREAM[Upstream Manga API]
+
+    FE -->|HTTP Request| NG
+    NG -->|Proxy Pass| API
+    API -->|Read and Write Cache| CACHE
+    API -->|Fetch Fresh Data| UPSTREAM
+    CACHE -->|Cached Response| API
+    UPSTREAM -->|JSON Response| API
+    API -->|API Response| NG
+    NG -->|HTTP Response| FE
 ```
 
 ---
 
-##  Tech Stack
+## Request Flow
+
+```mermaid
+flowchart TD
+    A[Client Request] --> B[Fastify Route]
+    B --> C{Fresh Cache Exists?}
+    C -->|Yes| D[Return Cached Response]
+    C -->|No| E[Fetch From Upstream API]
+    E --> F{Fetch Successful?}
+    F -->|Yes| G[Save Response to SQLite]
+    G --> H[Return Fresh Response]
+    F -->|No| I{Stale Cache Exists?}
+    I -->|Yes| J[Return Stale Cache]
+    I -->|No| K[Return 502 Upstream Error]
+```
+
+---
+
+## Tech Stack
 
 | Layer           | Tech                |
 | --------------- | ------------------- |
@@ -168,7 +165,7 @@ Built for a small Azure VPS setup:
 
 ---
 
-##  Endpoints
+## Endpoints
 
 | Method | Endpoint                  | Description                              |
 | ------ | ------------------------- | ---------------------------------------- |
@@ -188,33 +185,22 @@ Built for a small Azure VPS setup:
 
 ---
 
-##  Cache Behavior
+## Cache Behavior
 
 Every proxied response is stored with a cache key and TTL.
 
-```txt
-Request comes in
-      ↓
-Check SQLite cache
-      ↓
-Fresh cache exists?
-      ├─ Yes → return cached response
-      └─ No  → request upstream API
-                  ↓
-              Save response
-                  ↓
-              Return fresh data
+```mermaid
+flowchart LR
+    REQ[Request] --> CHECK[Check SQLite Cache]
+    CHECK --> HIT[Cache Hit]
+    CHECK --> MISS[Cache Miss or Expired]
+    HIT --> RES1[Return Cached Data]
+    MISS --> FETCH[Fetch Fresh Data]
+    FETCH --> SAVE[Save to Cache]
+    SAVE --> RES2[Return Fresh Data]
 ```
 
-If upstream refresh fails but stale cache exists:
-
-```txt
-Upstream error
-      ↓
-Stale cache available
-      ↓
-Return stale data safely
-```
+If upstream refresh fails but stale cache exists, the service can still return the older cached payload as a fallback.
 
 ### Cache Response Headers
 
@@ -229,7 +215,7 @@ Return stale data safely
 
 ---
 
-##  Default TTL Strategy
+## Default TTL Strategy
 
 | Data Type   | Env               | Default    |
 | ----------- | ----------------- | ---------- |
@@ -243,16 +229,16 @@ Return stale data safely
 | Detail      | `TTL_DETAIL`      | 6 hours    |
 | Chapter     | `TTL_CHAPTER`     | 7 days     |
 
-The goal is simple:
+General rule:
 
 ```txt
-Frequently changing data  → shorter TTL
-Rarely changing data      → longer TTL
+Frequently changing data  -> shorter TTL
+Rarely changing data      -> longer TTL
 ```
 
 ---
 
-##  Environment Variables
+## Environment Variables
 
 Copy `.env.example` to `.env`.
 
@@ -275,7 +261,7 @@ cp .env.example .env
 
 ---
 
-##  Local Development
+## Local Development
 
 ```bash
 git clone https://github.com/allifiz/apimanga.git
@@ -304,7 +290,7 @@ Example response:
 
 ---
 
-##  Deployment
+## Deployment
 
 Recommended production setup:
 
@@ -342,7 +328,7 @@ PUBLIC_RATE_LIMIT_WINDOW=1 minute
 
 ---
 
-##  Example Nginx Config
+## Example Nginx Config
 
 ```nginx
 server {
@@ -363,7 +349,7 @@ server {
 
 ---
 
-##  Cache Stats
+## Cache Stats
 
 Endpoint:
 
@@ -383,7 +369,7 @@ Example response:
 
 ---
 
-##  Project Structure
+## Project Structure
 
 ```txt
 apimanga
@@ -398,26 +384,24 @@ apimanga
 
 ---
 
-##  Roadmap
+## Roadmap
 
 * [ ] Add protected admin endpoint for clearing cache
-* [ ] Add OpenAPI / Swagger documentation
+* [ ] Add OpenAPI or Swagger documentation
 * [ ] Add Dockerfile for portable deployment
-* [ ] Add GitHub Actions install/check workflow
+* [ ] Add GitHub Actions install and check workflow
 * [ ] Add cache warm-up job for popular endpoints
 * [ ] Add uptime and upstream status reporting
 * [ ] Add request logging dashboard
 
 ---
 
-##  Author
+## Author
 
 Built by [@allifiz](https://github.com/allifiz)
 
 ---
 
-##  License
+## License
 
 MIT
-
-</div>
