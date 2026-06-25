@@ -32,7 +32,7 @@
 
 ---
 
-## ✨ Overview
+##  Overview
 
 **apimanga** is a lightweight proxy-cache API for manga reader applications.
 
@@ -58,7 +58,7 @@ Built for a small Azure VPS setup:
 
 ---
 
-## 🚀 Features
+##  Features
 
 <table>
 <tr>
@@ -78,7 +78,7 @@ Built for a small Azure VPS setup:
 </td>
 <td width="50%">
 
-### 🧠 Smart Cache
+### Smart Cache
 
 * SQLite response cache
 * Per-endpoint TTL
@@ -92,7 +92,7 @@ Built for a small Azure VPS setup:
 <tr>
 <td width="50%">
 
-### 🛡️ Protection Layer
+###  Protection Layer
 
 * Public rate limit
 * Upstream request throttle
@@ -103,7 +103,7 @@ Built for a small Azure VPS setup:
 </td>
 <td width="50%">
 
-### 🖥️ VPS Ready
+###  VPS Ready
 
 * Node.js 20+
 * PM2 compatible
@@ -117,7 +117,7 @@ Built for a small Azure VPS setup:
 
 ---
 
-## 🧩 Architecture
+##  Architecture
 
 ```txt
 ┌─────────────────────────────┐
@@ -152,7 +152,7 @@ Built for a small Azure VPS setup:
 
 ---
 
-## 📦 Tech Stack
+##  Tech Stack
 
 | Layer           | Tech                |
 | --------------- | ------------------- |
@@ -168,7 +168,7 @@ Built for a small Azure VPS setup:
 
 ---
 
-## 🛣️ Endpoints
+##  Endpoints
 
 | Method | Endpoint                  | Description                              |
 | ------ | ------------------------- | ---------------------------------------- |
@@ -188,7 +188,7 @@ Built for a small Azure VPS setup:
 
 ---
 
-## 🧠 Cache Behavior
+##  Cache Behavior
 
 Every proxied response is stored with a cache key and TTL.
 
@@ -229,7 +229,7 @@ Return stale data safely
 
 ---
 
-## ⏱️ Default TTL Strategy
+##  Default TTL Strategy
 
 | Data Type   | Env               | Default    |
 | ----------- | ----------------- | ---------- |
@@ -252,7 +252,7 @@ Rarely changing data      → longer TTL
 
 ---
 
-## ⚙️ Environment Variables
+##  Environment Variables
 
 Copy `.env.example` to `.env`.
 
@@ -275,7 +275,7 @@ cp .env.example .env
 
 ---
 
-## 🧪 Local Development
+##  Local Development
 
 ```bash
 git clone https://github.com/allifiz/apimanga.git
@@ -304,7 +304,7 @@ Example response:
 
 ---
 
-## 🚀 Deployment
+##  Deployment
 
 Recommended production setup:
 
@@ -342,7 +342,7 @@ PUBLIC_RATE_LIMIT_WINDOW=1 minute
 
 ---
 
-## 🌐 Example Nginx Config
+##  Example Nginx Config
 
 ```nginx
 server {
@@ -363,7 +363,7 @@ server {
 
 ---
 
-## 📊 Cache Stats
+##  Cache Stats
 
 Endpoint:
 
@@ -383,7 +383,7 @@ Example response:
 
 ---
 
-## 🗂️ Project Structure
+##  Project Structure
 
 ```txt
 apimanga
@@ -398,7 +398,7 @@ apimanga
 
 ---
 
-## 🧭 Roadmap
+##  Roadmap
 
 * [ ] Add protected admin endpoint for clearing cache
 * [ ] Add OpenAPI / Swagger documentation
@@ -410,13 +410,13 @@ apimanga
 
 ---
 
-## 🧑‍💻 Author
+##  Author
 
 Built by [@allifiz](https://github.com/allifiz)
 
 ---
 
-## 📄 License
+##  License
 
 MIT
 
