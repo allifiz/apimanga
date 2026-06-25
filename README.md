@@ -64,7 +64,7 @@ Built for a small Azure VPS setup:
 <tr>
 <td width="50%">
 
-### ⚡ Proxy API
+###  Proxy API
 
 * Latest comics
 * Popular comics
