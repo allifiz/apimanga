@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ apimanga
+#  apimanga
 
 ### Lightweight Manga API Proxy-Cache for Small VPS Environments
 
